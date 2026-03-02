@@ -19,10 +19,10 @@ use meshopt::{
 
 use crate::engine::{
     components::{
+        local_transform::LocalTransform,
         material::{
             MaterialData, MaterialProperties, MaterialState, MaterialTextures, MaterialType,
         },
-        transform::Transform,
     },
     ecs::{
         buffers_pool::BuffersMut,
@@ -160,7 +160,7 @@ pub fn on_load_model_system(
         let local_matrix = node_data.matrix;
 
         let (local_scale, rotation, position) = local_matrix.to_scale_rotation_translation();
-        let transform = Transform {
+        let transform = LocalTransform {
             local_position: position,
             local_rotation: rotation,
             local_scale,
@@ -378,7 +378,7 @@ pub fn on_load_model_system(
                 spawn_event_record.parent_index = Some(node_data.index);
                 spawn_event_record.material_reference = Some(material_reference);
                 spawn_event_record.mesh_buffer_reference = Some(mesh_buffer_reference);
-                spawn_event_record.transform = Transform::IDENTITY;
+                spawn_event_record.transform = LocalTransform::IDENTITY;
 
                 spawn_event.spawn_records.push(spawn_event_record.clone());
             }

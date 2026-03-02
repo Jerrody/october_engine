@@ -2,15 +2,12 @@ use bevy_ecs::{
     entity::Entity,
     system::{Commands, Res, ResMut, SystemParam},
 };
-use rapier3d::{
-    math::Vec3,
-    prelude::{RigidBodyBuilder, RigidBodyHandle},
-};
+use math::Vec3;
 
 use crate::engine::{
-    Mesh, Transform,
+    Mesh,
     ecs::{
-        mesh_buffers_pool::{MeshBufferReference, MeshBuffersPool},
+        mesh_buffers_pool::MeshBuffersPool,
         physics::{PhysicsManager, RigidBody},
     },
 };
@@ -43,10 +40,28 @@ impl<'w, 's> Physics<'w, 's> {
         entity_commands.insert(collider);
     }
 
-    pub fn create_rigid_body(&mut self, target_entity: Entity, transform: &Transform) -> RigidBody {
+    pub fn create_box_collider(
+        &mut self,
+        target_entity: Option<Entity>,
+        scale: Vec3,
+        position: Vec3,
+    ) {
+        let collider = self
+            .physics_manager
+            .create_box_collider(scale.to_array(), position.to_array());
+
+        if let Some(target_entity) = target_entity {
+            let mut entity_commands = self.commands.entity(target_entity);
+            entity_commands.insert(collider);
+        } else {
+            self.commands.spawn(collider);
+        }
+    }
+
+    pub fn create_rigid_body(&mut self, target_entity: Entity, world_position: Vec3) -> RigidBody {
         let rigid_body = self
             .physics_manager
-            .create_rigid_body(transform.local_position.to_array(), None);
+            .create_rigid_body(world_position.to_array(), None);
 
         let mut entity_commands = self.commands.entity(target_entity);
         entity_commands.insert(rigid_body);

@@ -1,6 +1,6 @@
 use bevy_ecs::component::Component;
 
-use crate::engine::Transform;
+use crate::engine::LocalTransform;
 
 #[derive(Default, Clone, Copy)]
 pub struct ClippingPlanes {
@@ -9,7 +9,7 @@ pub struct ClippingPlanes {
 }
 
 #[derive(Default, Component)]
-#[require(Transform)]
+#[require(LocalTransform)]
 pub struct Camera {
     pub fov: f32,
     pub clipping_planes: ClippingPlanes,

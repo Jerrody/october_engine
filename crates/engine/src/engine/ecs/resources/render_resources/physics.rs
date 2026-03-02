@@ -1,7 +1,7 @@
 use bevy_ecs::{component::Component, resource::Resource};
+use math::Vec3;
 use rapier3d::{
-    glamx::vec3,
-    math::Vec3,
+    glamx::{Quat, vec3},
     prelude::{
         CCDSolver, ColliderBuilder, ColliderSet, DefaultBroadPhase, ImpulseJointSet,
         IntegrationParameters, IslandManager, MultibodyJointSet, NarrowPhase, PhysicsPipeline,
@@ -9,29 +9,42 @@ use rapier3d::{
     },
 };
 
-use crate::engine::{Physics, ecs::components::mesh::MeshData};
+use crate::engine::{LocalTransform, Physics, ecs::components::mesh::MeshData};
 
 #[derive(Component, Clone, Copy)]
+#[require(LocalTransform)]
 pub struct Collider {
     pub(crate) collider_handle: rapier3d::prelude::ColliderHandle,
 }
 
 #[derive(Component, Clone, Copy)]
+#[require(LocalTransform)]
 pub struct RigidBody {
     pub(crate) rigid_body_handle: rapier3d::prelude::RigidBodyHandle,
 }
 
 impl RigidBody {
+    pub fn apply_impulse(&mut self, impulse: Vec3, physics: &mut Physics) {
+        let rigid_body = &mut physics.physics_manager.rigid_body_set[self.rigid_body_handle];
+        rigid_body.apply_impulse(rapier3d::math::Vec3::from_array(impulse.to_array()), true);
+    }
+
     pub fn get_world_position(&self, physics: &Physics) -> Vec3 {
         let rigid_body = &physics.physics_manager.rigid_body_set[self.rigid_body_handle];
 
-        rigid_body.translation()
+        Vec3::from_array(rigid_body.translation().to_array())
+    }
+
+    pub fn get_world_rotation(&self, physics: &Physics) -> Quat {
+        let rigid_body = &physics.physics_manager.rigid_body_set[self.rigid_body_handle];
+
+        *rigid_body.rotation()
     }
 }
 
 #[derive(Resource)]
 pub struct PhysicsManager {
-    gravity: Vec3,
+    gravity: rapier3d::math::Vec3,
     rigid_body_set: RigidBodySet,
     collider_set: ColliderSet,
     physics_pipeline: PhysicsPipeline,
@@ -46,19 +59,10 @@ pub struct PhysicsManager {
 
 impl PhysicsManager {
     pub fn new() -> Self {
+        let gravity = rapier3d::glamx::vec3(0.0, -9.81, 0.0);
+
         let rigid_body_set = RigidBodySet::new();
         let collider_set = ColliderSet::new();
-        /*         let collider = ColliderBuilder::cuboid(100.0, 0.1, 100.0).build();
-        collider_set.insert(collider);
-
-        let rigid_body = RigidBodyBuilder::dynamic()
-            .translation(vec3(0.0, 10.0, 0.0))
-            .build();
-        let collider = ColliderBuilder::ball(0.5).restitution(0.7).build();
-        let ball_body_handle = rigid_body_set.insert(rigid_body);
-        collider_set.insert_with_parent(collider, ball_body_handle, &mut rigid_body_set) */
-
-        let gravity = vec3(0.0, -9.81, 0.0);
         let integration_parameters = IntegrationParameters::default();
         let physics_pipeline = PhysicsPipeline::new();
         let island_manager = IslandManager::new();
@@ -113,7 +117,7 @@ impl PhysicsManager {
         let vertices = mesh_data
             .vertices
             .iter()
-            .map(|vertex| Vec3::from_array(vertex.position))
+            .map(|vertex| rapier3d::math::Vec3::from_array(vertex.position))
             .collect();
         let indices = mesh_data
             .indices
@@ -131,9 +135,11 @@ impl PhysicsManager {
         Collider { collider_handle }
     }
 
-    pub fn create_box_collider(&mut self, scale: Vec3) -> Collider {
-        let hscale = scale / 2.0;
-        let collider = ColliderBuilder::cuboid(hscale.x, hscale.y, hscale.z).build();
+    pub fn create_box_collider(&mut self, scale: [f32; 3], position: [f32; 3]) -> Collider {
+        let hscale = Vec3::from_array(scale) / 2.0;
+        let collider = ColliderBuilder::cuboid(hscale.x, hscale.y, hscale.z)
+            .translation(rapier3d::math::Vec3::from_array(position))
+            .build();
 
         let collider_handle = self.collider_set.insert(collider);
 

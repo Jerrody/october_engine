@@ -3,14 +3,14 @@ use math::{EulerRot, Mat4, Quat, Vec3};
 
 #[derive(Clone, Copy, Component, Debug)]
 #[require(GlobalTransform, Name)]
-pub struct Transform {
+pub struct LocalTransform {
     pub local_position: Vec3,
     pub local_rotation: Quat,
     pub local_scale: Vec3,
 }
 
-impl Transform {
-    pub const IDENTITY: Transform = Transform {
+impl LocalTransform {
+    pub const IDENTITY: LocalTransform = LocalTransform {
         local_position: Vec3::ZERO,
         local_rotation: Quat::IDENTITY,
         local_scale: Vec3::ONE,
@@ -95,9 +95,9 @@ impl Transform {
     }
 }
 
-impl Default for Transform {
+impl Default for LocalTransform {
     fn default() -> Self {
-        Transform::IDENTITY
+        LocalTransform::IDENTITY
     }
 }
 

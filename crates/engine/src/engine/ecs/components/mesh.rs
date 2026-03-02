@@ -1,7 +1,7 @@
 use bevy_ecs::component::Component;
 
 use crate::engine::{
-    components::transform::Transform,
+    components::local_transform::LocalTransform,
     ecs::{Vertex, materials_pool::MaterialReference, mesh_buffers_pool::MeshBufferReference},
 };
 
@@ -12,7 +12,7 @@ pub struct MeshData {
 }
 
 #[derive(Component, Clone, Copy)]
-#[require(Transform)]
+#[require(LocalTransform)]
 pub struct Mesh {
     pub(crate) mesh_buffer_reference: MeshBufferReference,
     pub(crate) material_reference: MaterialReference,

@@ -3,7 +3,7 @@ use bytemuck::Pod;
 use math::{Mat4, Vec3, Vec4};
 
 use crate::engine::{
-    Transform,
+    LocalTransform,
     components::camera::Camera,
     resources::{
         DirectionalLight, LightProperties, RendererContext, RendererResources, SceneData,
@@ -16,7 +16,7 @@ pub fn update_resources_system(
     mut renderer_resources: ResMut<RendererResources>,
     buffers: ResMut<BuffersPool>,
     mut frame_context: ResMut<frame_context::FrameContext>,
-    transform_camera_query: Query<(&Camera, &Transform)>,
+    transform_camera_query: Query<(&Camera, &LocalTransform)>,
 ) {
     let instances_objects_buffer = unsafe {
         renderer_resources

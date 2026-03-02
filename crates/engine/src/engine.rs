@@ -36,12 +36,13 @@ use crate::{
 
 pub use audio::*;
 pub use components::camera::{Camera, ClippingPlanes};
+pub use components::local_transform::LocalTransform;
 pub use components::mesh::Mesh;
 pub use components::time::Time;
-pub use components::transform::Transform;
 pub use events::LoadModelEvent;
 pub use math;
 pub use physics::{Collider, RigidBody};
+pub use queries::transform::*;
 pub use resources::Input;
 pub use system_params::physics::*;
 
@@ -87,13 +88,18 @@ impl Engine {
         let mut schedulers = world.resource_mut::<Schedules>();
 
         let scheduler_world_update = schedulers.entry(SchedulerWorldUpdate);
-        scheduler_world_update.add_systems((
-            propogate_disabled_to_new_children::propagate_disabled_to_new_children_system,
-            propogate_transforms_system.after(
+        scheduler_world_update.add_systems(
+            (
                 propogate_disabled_to_new_children::propagate_disabled_to_new_children_system,
-            ),
-            update_time::update_time_system,
-        ));
+                physics_tick::physics_tick_system,
+                physics_tick::physics_update_global_transforms,
+                physics_tick::physics_update_local_transforms,
+                propogate_transforms_system,
+            )
+                .chain(),
+        );
+
+        scheduler_world_update.add_systems((update_time::update_time_system));
 
         let scheduler_renderer_setup = schedulers.entry(SchedulerRendererSetup);
         scheduler_renderer_setup.add_systems(
@@ -109,7 +115,6 @@ impl Engine {
         scheduler_renderer_update.add_systems(
             (
                 check_audio_state::check_audio_state_system,
-                physics_tick::physics_tick_system,
                 prepare_frame::prepare_frame_system,
                 collect_instance_objects::collect_instance_objects_system,
                 update_resources::update_resources_system,

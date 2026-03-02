@@ -9,7 +9,7 @@ use bevy_ecs::{
 };
 use math::Mat4;
 
-use crate::engine::components::transform::{GlobalTransform, Transform};
+use crate::engine::components::local_transform::{GlobalTransform, LocalTransform};
 
 pub struct TransformsStack {
     pub stack: Vec<(Entity, Mat4, bool)>,
@@ -25,11 +25,11 @@ impl Default for TransformsStack {
 
 pub fn propogate_transforms_system(
     mut root_query: Query<
-        (Ref<Transform>, &mut GlobalTransform, Option<&Children>),
+        (Ref<LocalTransform>, &mut GlobalTransform, Option<&Children>),
         Without<ChildOf>,
     >,
     mut child_query: Query<
-        (Ref<Transform>, &mut GlobalTransform, Option<&Children>),
+        (Ref<LocalTransform>, &mut GlobalTransform, Option<&Children>),
         With<ChildOf>,
     >,
     mut transforms_stack: Local<TransformsStack>,

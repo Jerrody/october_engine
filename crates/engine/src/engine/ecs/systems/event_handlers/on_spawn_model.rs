@@ -3,14 +3,14 @@ use math::{Quat, Vec3};
 
 use crate::engine::{
     components::{
+        local_transform::{GlobalTransform, LocalTransform},
         mesh::Mesh,
-        transform::{GlobalTransform, Transform},
     },
     events::SpawnEvent,
 };
 
 pub fn on_spawn_mesh_system(spawn_event: On<SpawnEvent>, mut commands: Commands) {
-    let scene_transform = Transform {
+    let scene_transform = LocalTransform {
         local_position: Vec3::ZERO,
         local_rotation: Quat::IDENTITY,
         local_scale: Vec3::ONE,

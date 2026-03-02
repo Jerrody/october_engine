@@ -15,8 +15,8 @@ use bevy_ecs::{
 use engine::{
     GamePlugin,
     engine::{
-        AudioReference, Camera, ClippingPlanes, Input, LoadModelEvent, Mesh, Physics, RigidBody,
-        Time, Transform,
+        AudioReference, Camera, ClippingPlanes, Input, LoadModelEvent, LocalTransform, Mesh,
+        Physics, RigidBody, Time, Transform,
     },
 };
 use engine::{engine::Audio, math::*};
@@ -72,11 +72,11 @@ pub struct PlayerJump {
 }
 
 #[derive(Component)]
-#[require(Transform)]
+#[require(LocalTransform)]
 pub struct PlanetTag;
 
 #[derive(Component)]
-#[require(Transform)]
+#[require(LocalTransform)]
 pub struct AsteroidInstance {
     rotation_axis: AsteroidRotationAxis,
 }
@@ -86,7 +86,7 @@ pub trait Prefab {
 }
 
 #[derive(Component)]
-#[require(Transform)]
+#[require(LocalTransform)]
 pub struct AsteroidPrefab;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -112,7 +112,7 @@ impl Command for CloneHierarchyCommand {
 
         let entity = entity_cloner.spawn_clone(world, self.source);
         let mut entity = world.entity_mut(entity);
-        let mut entity_transform = entity.get_mut::<Transform>().unwrap();
+        let mut entity_transform = entity.get_mut::<LocalTransform>().unwrap();
         entity_transform.local_position = self.position;
         entity_transform.local_scale = self.scale;
         entity_transform.set_local_euler_angles(self.rotation);
@@ -171,7 +171,7 @@ fn spawn_planet(mut commands: Commands) {
     exe_path.pop();
 
     let planet_scale = 20.0;
-    let mut planet_transform = Transform::IDENTITY;
+    let mut planet_transform = LocalTransform::IDENTITY;
     planet_transform.local_scale *= planet_scale;
 
     let planet_entity = commands.spawn((PlanetTag, planet_transform));
@@ -186,7 +186,7 @@ fn spawn_planet(mut commands: Commands) {
     });
 
     let asteroid = 1.0;
-    let mut asteroid_transform = Transform::IDENTITY;
+    let mut asteroid_transform = LocalTransform::IDENTITY;
     asteroid_transform.local_scale *= asteroid;
 
     let asteroid_entity = commands.spawn((AsteroidPrefab, Disabled, asteroid_transform));
@@ -203,7 +203,7 @@ fn spawn_planet(mut commands: Commands) {
 
 fn spawn_asteroids(
     mut commands: Commands,
-    planet_query: Query<&Transform, With<PlanetTag>>,
+    planet_query: Query<&LocalTransform, With<PlanetTag>>,
     asteroid_prefab_query: Query<(Entity, Option<&Children>, Has<Disabled>), With<AsteroidPrefab>>,
     mut random: ResMut<Random>,
     mut has_spawned: Local<bool>,
@@ -260,62 +260,37 @@ fn spawn_asteroids(
 }
 
 fn create_rigidbody_for_planet(
-    planet_query: Query<(Entity, &Transform), With<PlanetTag>>,
+    planet_query: Query<(Entity, Transform), With<PlanetTag>>,
     children_query: Query<&Children>,
-    child_name_query: Query<&Name>,
     mesh_query: Query<&Mesh>,
-    rigid_body_query: Query<&RigidBody>,
     mut physics: Physics,
     mut is_created_rigidbody: Local<bool>,
 ) {
+    physics.create_box_collider(None, Vec3::new(100.0, 5.0, 100.0), vec3(0.0, -40.0, 0.0));
+
     if !*is_created_rigidbody && let Ok((planet_entity, transform)) = planet_query.single() {
+        let mut stack: Vec<Entity> = Vec::new();
+
         if let Ok(children) = children_query.get(planet_entity) {
-            for child_entity in children {
-                /*                if let Ok(child_name) = child_name_query.get(*child_entity) {
-                    println!("Name: {child_name}");
-                } */
+            stack.extend(children.into_iter().copied().rev());
+        } else {
+            println!("Parent entity has no children to search.");
+            return;
+        }
 
-                let mut stack: Vec<Entity> = Vec::new();
+        while let Some(current_entity) = stack.pop() {
+            if let Ok(&mesh_component) = mesh_query.get(current_entity) {
+                *is_created_rigidbody = true;
 
-                if let Ok(children) = children_query.get(planet_entity) {
-                    stack.extend(children.into_iter().copied().rev());
-                } else {
-                    println!("Parent entity has no children to search.");
-                    return;
-                }
+                let mut rigid_body = physics.create_rigid_body(planet_entity, transform.position());
+                physics.create_mesh_collider_from_mesh(planet_entity, mesh_component, rigid_body);
+                rigid_body.apply_impulse(Vec3::new(100000.0 * 2.0, 0.0, 0.0), &mut physics);
 
-                while let Some(current_entity) = stack.pop() {
-                    if let Ok(&mesh_component) = mesh_query.get(current_entity) {
-                        *is_created_rigidbody = true;
+                return;
+            }
 
-                        let rigid_body = physics.create_rigid_body(planet_entity, transform);
-                        physics.create_mesh_collider_from_mesh(
-                            planet_entity,
-                            mesh_component,
-                            rigid_body,
-                        );
-
-                        return;
-                    }
-
-                    if let Ok(children) = children_query.get(current_entity) {
-                        stack.extend(children.into_iter().copied().rev());
-                    }
-                }
-
-                /*               if let Ok(mesh_component) = mesh_query.get(*child_entity) {
-                    *is_created_rigidbody = true;
-
-                    physics.create_rigid_body(planet_entity, transform);
-                    let rigid_body_component = rigid_body_query.get(planet_entity).unwrap();
-                    physics.create_mesh_collider_from_mesh(
-                        planet_entity,
-                        mesh_component,
-                        rigid_body_component,
-                    );
-
-                    break;
-                } */
+            if let Ok(children) = children_query.get(current_entity) {
+                stack.extend(children.into_iter().copied().rev());
             }
         }
     }
@@ -325,17 +300,18 @@ fn print_planet_rigid_body_info(
     planet_rigid_body_query: Query<&RigidBody, With<PlanetTag>>,
     physics: Physics,
 ) {
-    if let Ok(planet_rigid_body) = planet_rigid_body_query.single() {
+    /*     if let Ok(planet_rigid_body) = planet_rigid_body_query.single() {
         println!(
             "Planet Rigidbody World Position: {}",
             planet_rigid_body.get_world_position(&physics)
         );
     }
+    */
 }
 
 fn rotate_asteroids(
     time: Res<Time>,
-    mut asteroids_query: Query<(&mut Transform, &AsteroidInstance)>,
+    mut asteroids_query: Query<(&mut LocalTransform, &AsteroidInstance)>,
 ) {
     let asteroid_speed = 1.0;
     let delta_time = time.get_delta_time();
@@ -382,7 +358,7 @@ fn spawn_player(mut commands: Commands) {
     };
 
     let mut player_entity = commands.spawn_empty();
-    let mut player_transform = Transform::IDENTITY;
+    let mut player_transform = LocalTransform::IDENTITY;
     player_transform.local_position.z = 150.0;
     player_transform.local_position.y = -5.0;
 
@@ -395,7 +371,7 @@ fn spawn_player(mut commands: Commands) {
 }
 
 fn move_player(
-    mut player_query: Query<(&mut Transform, &PlayerStats, &PlayerJump)>,
+    mut player_query: Query<(&mut LocalTransform, &PlayerStats, &PlayerJump)>,
     time: Res<Time>,
     input: Res<Input>,
 ) {
@@ -429,7 +405,7 @@ fn move_player(
 }
 
 fn rotate_player(
-    mut player_query: Query<(&mut Transform, &PlayerStats)>,
+    mut player_query: Query<(&mut LocalTransform, &PlayerStats)>,
     time: Res<Time>,
     input: Res<Input>,
 ) {
@@ -449,7 +425,7 @@ fn rotate_player(
 }
 
 fn jump_player(
-    mut player_query: Query<(&mut Transform, &mut PlayerJump)>,
+    mut player_query: Query<(&mut LocalTransform, &mut PlayerJump)>,
     time: Res<Time>,
     input: Res<Input>,
 ) {

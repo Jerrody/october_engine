@@ -1,7 +1,7 @@
 use bevy_ecs::system::{Query, Res, ResMut};
 
 use crate::engine::{
-    components::{mesh::Mesh, transform::GlobalTransform},
+    components::{local_transform::GlobalTransform, mesh::Mesh},
     ecs::{InstanceObject, materials_pool::MaterialsPool, mesh_buffers_pool::MeshBuffers},
     resources::RendererResources,
 };
