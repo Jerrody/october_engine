@@ -1,7 +1,7 @@
 use bevy_ecs::{component::Component, resource::Resource};
 use math::Vec3;
 use rapier3d::{
-    glamx::{Quat, vec3},
+    glamx::Quat,
     prelude::{
         CCDSolver, ColliderBuilder, ColliderSet, DefaultBroadPhase, ImpulseJointSet,
         IntegrationParameters, IslandManager, MultibodyJointSet, NarrowPhase, PhysicsPipeline,
@@ -122,7 +122,7 @@ impl PhysicsManager {
         let indices: Vec<[u32; 3]> = mesh_data
             .indices
             .chunks_exact(3)
-            .map(|chunk| [chunk[0] as u32, chunk[1] as u32, chunk[2] as u32])
+            .map(|chunk| [chunk[0], chunk[1], chunk[2]])
             .collect();
 
         let collider =

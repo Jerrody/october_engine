@@ -99,7 +99,7 @@ impl Engine {
                 .chain(),
         );
 
-        scheduler_world_update.add_systems((update_time::update_time_system));
+        scheduler_world_update.add_systems(update_time::update_time_system );
 
         let scheduler_renderer_setup = schedulers.entry(SchedulerRendererSetup);
         scheduler_renderer_setup.add_systems(

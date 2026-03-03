@@ -1,7 +1,7 @@
 use bevy_ecs::{
     hierarchy::ChildOf,
     query::{Changed, With},
-    system::{Query, Res, ResMut},
+    system::{Query, ResMut},
 };
 use math::{Mat4, Quat, Vec3};
 

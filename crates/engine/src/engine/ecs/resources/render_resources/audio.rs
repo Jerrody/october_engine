@@ -84,12 +84,12 @@ impl Audio {
             }
         };
 
-        let audio_reference = AudioReference {
+        
+
+        AudioReference {
             key: audio_key,
             hash: path_hash,
-        };
-
-        audio_reference
+        }
     }
 
     pub(crate) fn check_audio_state(&mut self) {

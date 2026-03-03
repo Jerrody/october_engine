@@ -295,7 +295,7 @@ impl BuffersPool {
         let allocation_create_info = AllocationCreateInfo {
             flags: allocation_flags,
             usage: MemoryUsage::Auto,
-            required_flags: required_flags,
+            required_flags,
             preferred_flags,
             ..Default::default()
         };

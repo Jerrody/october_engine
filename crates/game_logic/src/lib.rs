@@ -6,7 +6,6 @@ use bevy_ecs::{
     entity::{Entity, EntityCloner},
     entity_disabling::Disabled,
     hierarchy::Children,
-    name::Name,
     query::{Has, With},
     relationship::RelationshipTarget,
     system::{Command, Commands, Local, Query, Res, ResMut},
@@ -133,7 +132,7 @@ fn play_audio(mut commands: Commands, mut audio: ResMut<Audio>) {
     exe_path.pop();
     exe_path.pop();
 
-    let sound = audio.load_audio(&PathBuf::from(std::format!(
+    let _sound = audio.load_audio(&PathBuf::from(std::format!(
         "{}/assets/audio/sound.mp3",
         exe_path.as_os_str().display()
     )));
@@ -301,8 +300,8 @@ fn create_rigidbody_for_planet(
 }
 
 fn print_planet_rigid_body_info(
-    planet_rigid_body_query: Query<&RigidBody, With<PlanetTag>>,
-    physics: Physics,
+    _planet_rigid_body_query: Query<&RigidBody, With<PlanetTag>>,
+    _physics: Physics,
 ) {
     /*     if let Ok(planet_rigid_body) = planet_rigid_body_query.single() {
         println!(

@@ -9,7 +9,7 @@ pub mod textures_pool;
 
 use bevy_ecs::resource::Resource;
 use bytemuck::{NoUninit, Pod, Zeroable};
-use math::{Mat4, Vec3, Vec4};
+use math::{Vec3, Vec4};
 use padding_struct::padding_struct;
 use slotmap::new_key_type;
 use vulkanite::vk::{rs::*, *};
