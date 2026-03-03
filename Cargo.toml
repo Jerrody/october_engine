@@ -5,6 +5,7 @@ members = [
     "crates/game_logic",
     "crates/game_runner",
     "crates/engine/crates/math",
+    "crates/engine/crates/importer",
     # "crates/engine/crates/physics",
 ]
 
@@ -20,6 +21,7 @@ rapier3d = { version = "0.32.0", features = ["simd-stable", "parallel"] }
 engine = { path = "crates/engine" }
 game_logic = { path = "crates/game_logic" }
 math = { path = "crates/engine/crates/math" }
+importer = { path = "crates/engine/crates/importer" }
 # physics = { path = "crates/engine/crates/physics" }
 
 [profile.dev]
