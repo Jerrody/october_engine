@@ -5,12 +5,22 @@ edition = "2024"
 publish = false
 
 [dependencies]
+math = { workspace = true }
+
+bytemuck = { workspace = true }
+num_cpus = { workspace = true }
+
 ron = { workspace = true }
 rkyv = { workspace = true }
 serde = { workspace = true }
 walkdir = { workspace = true }
 bevy_ecs = { workspace = true }
 asset-importer = { workspace = true }
+image = { workspace = true }
+ktx2-rw = { workspace = true }
+fast_image_resize = { workspace = true }
+meshopt = { workspace = true }
+padding-struct = { workspace = true }
 
 uuid = { workspace = true }
 uuid-simd = { workspace = true }

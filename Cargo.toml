@@ -29,6 +29,18 @@ ron = "0.12.0"
 rkyv = "0.8.15"
 uuid = { version = "1.21.0", features = ["fast-rng"] }
 uuid-simd = { version = "0.8", default-features = false, features = ["std"] }
+meshopt = "0.6.2"
+image = { version = "0.25.9", default-features = false, features = [
+    "png",
+    "jpeg",
+    "hdr",
+    "rayon",
+] }
+ktx2-rw = "0.2.4"
+fast_image_resize = { version = "6.0.0", features = ["rayon", "image"] }
+padding-struct = "0.2.0"
+bytemuck = "1.25.0"
+num_cpus = "1.17.0"
 
 engine = { path = "crates/engine" }
 game_logic = { path = "crates/game_logic" }
