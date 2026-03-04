@@ -4,16 +4,26 @@ use bevy_ecs::{resource::Resource, system::ResMut};
 use walkdir::WalkDir;
 
 type ModelLoader = asset_importer::Importer;
+type Uuid = String;
 
 #[derive(Clone, serde::Serialize, serde::Deserialize, Debug)]
-pub struct ModelAsset {
+pub struct ModelAssetMetadata {
     name: String,
     path: PathBuf,
+    textures: Vec<Uuid>,
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize, Debug)]
+pub struct TextureAssetMetadata {
+    uuid: Uuid,
+    name: String,
+    path: Option<PathBuf>,
 }
 
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub enum AssetMetadata {
-    Model(ModelAsset),
+    Model(ModelAssetMetadata),
+    Texture(TextureAssetMetadata),
 }
 
 pub struct Serializers {
@@ -162,9 +172,11 @@ pub fn check_if_asset_is_serialized(mut importer: ResMut<Importer>) {
         !meta_files.iter().any(|meta_file| {
             let meta_name = match meta_file {
                 AssetMetadata::Model(model_asset) => model_asset.name.as_str(),
+                AssetMetadata::Texture(texture_asset_metadata) => todo!(),
             };
             let meta_path = match meta_file {
                 AssetMetadata::Model(model_asset) => model_asset.path.as_path(),
+                AssetMetadata::Texture(texture_asset_metadata) => todo!(),
             };
 
             name.eq(meta_name) && path.eq(meta_path)

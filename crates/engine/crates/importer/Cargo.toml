@@ -11,3 +11,6 @@ serde = { workspace = true }
 walkdir = { workspace = true }
 bevy_ecs = { workspace = true }
 asset-importer = { workspace = true }
+
+uuid = { workspace = true }
+uuid-simd = { workspace = true }

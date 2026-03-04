@@ -11,7 +11,7 @@ members = [
 
 [workspace.dependencies]
 rayon = "1.11.0"
-bevy_ecs = { version = "0.18.0", default-features = false, features = [
+bevy_ecs = { version = "0.18.1", default-features = false, features = [
     "std",
     "backtrace",
     "multi_threaded",
@@ -27,6 +27,8 @@ walkdir = "2.5"
 serde = { version = "1.0.228", features = ["derive"] }
 ron = "0.12.0"
 rkyv = "0.8.15"
+uuid = { version = "1.21.0", features = ["fast-rng"] }
+uuid-simd = { version = "0.8", default-features = false, features = ["std"] }
 
 engine = { path = "crates/engine" }
 game_logic = { path = "crates/game_logic" }
