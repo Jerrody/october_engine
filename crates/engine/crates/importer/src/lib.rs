@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::PathBuf, str::FromStr};
+use std::{collections::HashMap, io::Read, path::PathBuf, str::FromStr};
 use uuid::{Uuid, Version, uuid};
 
 use asset_importer::{Matrix4x4, node::Node, postprocess::PostProcessSteps, raw};
@@ -214,20 +214,6 @@ pub enum AssetMetadata {
     Texture(TextureAssetMetadata),
 }
 
-pub struct Serializers {
-    pub ron_pretty_config: ron::ser::PrettyConfig,
-}
-
-impl Serializers {
-    pub fn new() -> Self {
-        let ron_pretty_config = ron::ser::PrettyConfig::new()
-            .depth_limit(2)
-            .indentor("    ".to_string());
-
-        Self { ron_pretty_config }
-    }
-}
-
 #[derive(Clone)]
 pub struct BaseAssetEntry {
     pub name: String,
@@ -259,7 +245,6 @@ pub struct Importer {
     serialized_assets_folder_path_buffer: PathBuf,
     serialized_assets_path_buffers: SerializedAssetsPathBuffers,
     assets_to_serialize: Vec<PathBuf>,
-    serializers: Serializers,
     meta_files: Vec<AssetMetadata>,
     assets_entries: Vec<AssetEntry>,
 }
@@ -291,7 +276,6 @@ impl Importer {
                 materials_path,
             },
             assets_to_serialize: Default::default(),
-            serializers: Serializers::new(),
             meta_files: Vec::new(),
             assets_entries: Vec::new(),
         }
@@ -332,10 +316,13 @@ pub fn collect_assets_to_serialize_system(mut importer: ResMut<Importer>) {
     {
         if entry.file_type().is_file() {
             if entry.path().extension().unwrap().to_str().eq(&Some("meta")) {
-                let meta_file = ron::de::from_reader::<std::fs::File, AssetMetadata>(
-                    std::fs::File::open(entry.path()).unwrap(),
-                )
-                .unwrap();
+                let mut metadata_content = String::new();
+                std::fs::File::open(entry.path())
+                    .unwrap()
+                    .read_to_string(&mut metadata_content)
+                    .unwrap();
+                let meta_file =
+                    toml::de::from_str::<AssetMetadata>(metadata_content.as_str()).unwrap();
 
                 importer.meta_files.push(meta_file);
             } else {
@@ -468,11 +455,8 @@ pub fn serialize_unserialized_assets_system(mut importer: ResMut<Importer>) {
                     // TODO: Temp commenting.
                     // textures,
                 });
-                let serialized_model_asset_metadata = ron::ser::to_string_pretty(
-                    &model_asset_metadata,
-                    importer.serializers.ron_pretty_config.clone(),
-                )
-                .unwrap();
+                let serialized_model_asset_metadata =
+                    toml::ser::to_string_pretty(&model_asset_metadata).unwrap();
 
                 let model_asset_metadata_path = model_entry.entry.path_buf.clone();
 

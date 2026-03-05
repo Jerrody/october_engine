@@ -1,5 +1,4 @@
-Model((
-    uuid: "2a69b5f3-39ff-5de6-adce-17983ad2c900",
-    name: "scifi_helmet.glb",
-    path_buf: "E:\\Projects\\vulkan_renderer\\assets\\scifi_helmet.glb",
-))
+[Model]
+uuid = "2a69b5f3-39ff-5de6-adce-17983ad2c900"
+name = "scifi_helmet.glb"
+path_buf = 'E:\Projects\vulkan_renderer\assets\scifi_helmet.glb'
