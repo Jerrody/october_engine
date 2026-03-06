@@ -298,7 +298,7 @@ impl Importer {
         exe_path.pop();
         exe_path.pop();
         exe_path.pop();
-        exe_path.push("intermediate");
+        exe_path.push("artifacts");
 
         exe_path
     }
@@ -427,10 +427,15 @@ pub fn serialize_unserialized_assets_system(mut importer: ResMut<Importer>) {
                     &Importer::ENGINE_ASSET_NAMESPACE,
                     normalized_asset_path.as_bytes(),
                 );
+                let uuid_str = uuid.as_simple().to_string();
 
-                let serialized_model_path_buffer = importer
+                let serialized_asset_path = importer
                     .serialized_assets_path_buffers
                     .model_path
+                    .join(&uuid_str[0..2]);
+                std::fs::create_dir_all(serialized_asset_path.as_path()).unwrap();
+
+                let serialized_model_path_buffer = serialized_asset_path
                     .join(std::format!("{}_{}", model_name, uuid))
                     .clone();
                 let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&serialized_model)
