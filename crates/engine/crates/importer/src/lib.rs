@@ -441,7 +441,7 @@ pub fn serialize_unserialized_assets_system(mut importer: ResMut<Importer>) {
                 let model_asset_metadata = AssetMetadata::Model(ModelAssetMetadata {
                     uuid,
                     name: model_name,
-                    path_buf: model_entry.entry.path_buf.clone(),
+                    path_buf: PathBuf::from(normalized_asset_path),
                     // TODO: Temp commenting.
                     // textures,
                 });
