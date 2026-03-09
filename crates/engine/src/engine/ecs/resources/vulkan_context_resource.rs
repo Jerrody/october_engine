@@ -10,10 +10,7 @@ use vulkanite::vk::{
 };
 
 use crate::engine::{
-    ecs::{
-        buffers_pool::BuffersPool,
-        textures_pool::AllocatedImage,
-    },
+    ecs::{buffers_pool::BuffersPool, textures_pool::AllocatedImage},
     resources::UploadContext,
     utils::transition_image,
 };
