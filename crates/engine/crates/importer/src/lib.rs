@@ -776,7 +776,6 @@ fn extract_texture(
             let target_path = PathBuf::from(model_path)
                 .join(std::format!("{}_media", model_name))
                 .join("textures");
-            println!("{}", target_path.display());
             std::fs::create_dir_all(&target_path).unwrap();
 
             // TODO: Currently, we upload only base maps, so, we're hardcoding prefix of texture.
