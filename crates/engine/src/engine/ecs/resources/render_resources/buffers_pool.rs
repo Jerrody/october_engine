@@ -19,6 +19,8 @@ use vulkanite::{
     },
 };
 
+use crate::engine::ecs::CommandGroup;
+
 pub struct MapppedAllocationHandler {
     allocator: Allocator,
     allocation: Allocation,
