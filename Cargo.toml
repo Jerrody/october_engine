@@ -5,10 +5,10 @@ members = [
     "crates/game_logic",
     "crates/game_runner",
     "crates/engine/crates/math",
-    "crates/engine/crates/importer",
-    "crates/engine/crates/loader",
-    "crates/engine/crates/asset_database",
-    "crates/engine/crates/shared",
+    "crates/engine/crates/asset_management/importer",
+    "crates/engine/crates/asset_management/loader",
+    "crates/engine/crates/asset_management/asset_database",
+    "crates/engine/crates/asset_management/shared",
     # "crates/engine/crates/physics",
 ]
 
@@ -55,10 +55,10 @@ slotmap = { git = "https://github.com/Jerrody/slotmap" }
 engine = { path = "crates/engine" }
 game_logic = { path = "crates/game_logic" }
 math = { path = "crates/engine/crates/math" }
-importer = { path = "crates/engine/crates/importer" }
-loader = { path = "crates/engine/crates/loader" }
-shared = { path = "crates/engine/crates/shared" }
-asset_database = { path = "crates/engine/crates/asset_database" }
+importer = { path = "crates/engine/crates/asset_management/importer" }
+loader = { path = "crates/engine/crates/asset_management/loader" }
+shared = { path = "crates/engine/crates/asset_management/shared" }
+asset_database = { path = "crates/engine/crates/asset_management/asset_database" }
 # physics = { path = "crates/engine/crates/physics" }
 
 [profile.dev]

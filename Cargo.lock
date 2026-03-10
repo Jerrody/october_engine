@@ -214,6 +214,8 @@ dependencies = [
  "padding-struct",
  "rkyv",
  "serde",
+ "shared",
+ "slotmap 1.1.1 (git+https://github.com/Jerrody/slotmap)",
  "toml",
  "uuid",
  "uuid-simd",
