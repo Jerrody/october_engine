@@ -19,6 +19,7 @@ bevy_ecs = { version = "0.18.1", default-features = false, features = [
     "std",
     "backtrace",
     "multi_threaded",
+    "debug",
 ] }
 winit = { version = "=0.31.0-beta.2", default-features = false }
 rapier3d = { version = "0.32.0", features = ["simd-stable", "parallel"] }

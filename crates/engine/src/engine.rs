@@ -4,6 +4,7 @@ mod general;
 mod setup;
 mod utils;
 
+use asset_database::AssetDatabase;
 use ecs::*;
 
 use bevy_ecs::{
@@ -12,6 +13,8 @@ use bevy_ecs::{
     world::World,
 };
 use importer::Importer;
+use information::Information;
+use loader::Loader;
 use math::Random;
 use winit::{event::ElementState, keyboard::KeyCode, window::Window};
 
@@ -89,7 +92,10 @@ impl Engine {
         world.insert_resource(frame_context);
 
         world.init_resource::<Schedules>();
+        world.insert_resource(Information::new());
+        world.insert_resource(AssetDatabase::new());
         world.insert_resource(Importer::new());
+        world.insert_resource(Loader::new());
 
         let mut schedulers = world.resource_mut::<Schedules>();
 
@@ -100,6 +106,7 @@ impl Engine {
                 importer::resolve_assets_entries_system,
                 importer::check_if_asset_is_serialized_system,
                 importer::serialize_unserialized_assets_system,
+                loader::load_assets_system,
             )
                 .chain(),
         );
